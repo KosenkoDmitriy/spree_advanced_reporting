@@ -14,6 +14,8 @@ Spree::Core::Engine.routes.draw do
   match '/admin/reports/top_customers' => 'admin/reports#top_customers', :via  => [:get, :post], :as => 'top_customers_admin_reports'
   match '/admin/reports/top_products'  => 'admin/reports#top_products',  :via  => [:get, :post], :as => 'top_products_admin_reports'
 
+  match '/admin/reports/customers' => 'admin/reports#customers', :via  => [:get, :post], :as => 'customers_admin_reports'
+
   match '/admin/reports/geo_revenue' => 'admin/reports#geo_revenue', :via => [:get, :post], :as => 'geo_revenue_admin_reports'
   match '/admin/reports/geo_units'   => 'admin/reports#geo_units',   :via => [:get, :post], :as => 'geo_units_admin_reports'
   match '/admin/reports/geo_profit'  => 'admin/reports#geo_profit',  :via => [:get, :post], :as => 'geo_profit_admin_reports'

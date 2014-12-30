@@ -6,6 +6,7 @@ Advanced reporting for Spree.
 * Base reports of Revenue, Units, Profit into Daily, Weekly, Monthly, and Yearly increments
 * Geo reports of Revenue, Units divided into states and countries
 * Two "top" reports for top products and top customers
+* All customer report that displays the number of orders in a period of time as well if customer was a new customer during that time peroid.
 * The ability to limit reports by order date, "store" (multi-store extension), product, and taxon.
 * The ability to export data in PDF or CSV format.
 
