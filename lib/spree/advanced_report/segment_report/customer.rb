@@ -14,7 +14,7 @@ class Spree::AdvancedReport::SegmentReport::Customer < Spree::AdvancedReport::Se
     super(params)
 
     orders.each do |order|
-      if order.user
+      if order.user && orderCompleted?(order)
         data[order.user.id] ||= {
             :email => order.user.email,
             :revenue => 0,
@@ -29,12 +29,11 @@ class Spree::AdvancedReport::SegmentReport::Customer < Spree::AdvancedReport::Se
       end
     end
 
-    all_orders = Spree::Order.all
-
-    all_orders.select do |allOrder|
-      if allOrder.user
-        if data[allOrder.user.id].present?
-          data[allOrder.user.id][:total_orders] += 1
+    all_completed_orders = Spree::Order.complete
+    all_completed_orders.select do |completed_order|
+      if completed_order.user && orderCompleted?(completed_order)
+        if data[completed_order.user.id].present?
+          data[completed_order.user.id][:total_orders] += 1
         end
       end
     end
@@ -54,5 +53,9 @@ class Spree::AdvancedReport::SegmentReport::Customer < Spree::AdvancedReport::Se
   private
   def newCustomer?(data, key)
     data[key][:order_count] == data[key][:total_orders] ? 'New' : 'Returning'
+  end
+
+  def orderCompleted?(order)
+    order.completed? && order.paid? && order.state == 'complete'
   end
 end

@@ -22,13 +22,13 @@
 
           <div class="date-range-filter field align-center">
             <%= label_tag nil, t(:start), :class => 'inline' %>
-            <%= s.text_field :created_at_gt, :class => 'datepicker datepicker-from', :value => @report.params['search']['completed_at_gt'].strftime('%Y/%m/%d') %>
+            <%= s.text_field :created_at_gt, :class => 'datepicker datepicker-from', :value => @report.params[:search][:created_at_gt]%>
 
             <span class="range-divider">
           <i class="icon-arrow-right"></i>
         </span>
 
-            <%= s.text_field :created_at_lt, :class => 'datepicker datepicker-to', :value => @report.params['search']['completed_at_lt'].strftime('%Y/%m/%d') %>
+            <%= s.text_field :created_at_lt, :class => 'datepicker datepicker-to', :value => @report.params[:search][:created_at_lt]%>
             <%= label_tag nil, t(:end), :class => 'inline' %>
           </div>
 
