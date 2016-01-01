@@ -9,16 +9,16 @@ module Spree
         @end_date = report_params[:end_date]
       end
 
-      @orders = Order.
-        eager_load(
-          :all_adjustments,
-          :valid_payments,
-          shipments: [:selected_shipping_method],
-          line_items: [:variant]
-        ).
-        where(completed_at: [@begin_date..@end_date]).
-        where("spree_payments.state = 'completed'").
-        order(:completed_at)
+      @orders = Order
+                .eager_load(
+                  :all_adjustments,
+                  :valid_payments,
+                  shipments: [:selected_shipping_method],
+                  line_items: [:variant]
+                )
+                .where(completed_at: [@begin_date..@end_date])
+                .where("spree_payments.state = 'completed'")
+                .order(:completed_at)
     end
 
     def line_items
@@ -58,36 +58,33 @@ module Spree
         end
 
         # Shipments
-        if order.ship_total?
-          order.shipments.each do |shipment|
-            lines << ReportLine.new(
-              order.number,
-              order.completed_at.strftime('%m/%d/%Y'),
-              shipment.selected_shipping_method.name,
-              nil,
-              nil,
-              shipment.cost.to_f,
-              transaction_id
-            )
-          end
+        next unless order.ship_total?
+        order.shipments.each do |shipment|
+          lines << ReportLine.new(
+            order.number,
+            order.completed_at.strftime('%m/%d/%Y'),
+            shipment.selected_shipping_method.name,
+            nil,
+            nil,
+            shipment.cost.to_f,
+            transaction_id
+          )
         end
-
       end
       lines
     end
 
     def to_csv
-      lines = self.line_items.collect(&:values)
+      lines = line_items.collect(&:values)
       CSV.generate do |csv|
-        csv << [
-          'number',
-          'completed_date',
-          'sku',
-          'quantity',
-          'unit_price',
-          'amount',
-          'transaction_id'
-        ]
+        csv << %w(
+          number
+          completed_date
+          sku
+          quantity
+          unit_price
+          amount
+          transaction_id)
         lines.each do |li|
           csv << li
         end
@@ -103,6 +100,5 @@ module Spree
       :amount,
       :transaction_id
     )
-
   end
 end

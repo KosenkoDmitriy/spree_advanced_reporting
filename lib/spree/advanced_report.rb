@@ -4,11 +4,11 @@ module Spree
     attr_accessor :orders, :product_text, :date_text, :taxon_text, :ruportdata, :data, :params, :taxon, :product, :product_in_taxon, :unfiltered_params
 
     def name
-      "Base Advanced Report"
+      'Base Advanced Report'
     end
 
     def description
-      "Base Advanced Report"
+      'Base Advanced Report'
     end
 
     def initialize(params)
@@ -23,14 +23,22 @@ module Spree
           params[:search][:completed_at_gt] = Order.minimum(:completed_at).beginning_of_day
         end
       else
-        params[:search][:completed_at_gt] = Time.zone.parse(params[:search][:completed_at_gt]).beginning_of_day rescue ""
+        params[:search][:completed_at_gt] = begin
+                                              Time.zone.parse(params[:search][:completed_at_gt]).beginning_of_day
+                                            rescue
+                                              ''
+                                            end
       end
       if params[:search][:completed_at_lt].blank?
         if (Order.count > 0) && Order.maximum(:completed_at)
           params[:search][:completed_at_lt] = Order.maximum(:completed_at).end_of_day
         end
       else
-        params[:search][:completed_at_lt] = Time.zone.parse(params[:search][:completed_at_lt]).end_of_day rescue ""
+        params[:search][:completed_at_lt] = begin
+                                              Time.zone.parse(params[:search][:completed_at_lt]).end_of_day
+                                            rescue
+                                              ''
+                                            end
       end
 
       params[:search][:completed_at_not_null] = true
@@ -49,38 +57,34 @@ module Spree
           self.product = Product.find(params[:advanced_reporting][:product_id])
         end
       end
-      if self.taxon && self.product && !self.product.taxons.include?(self.taxon)
+      if taxon && product && !product.taxons.include?(taxon)
         self.product_in_taxon = false
       end
 
-      if self.product
-        self.product_text = "<label>Product:</label> #{self.product.name}"
-      end
-      if self.taxon
-        self.taxon_text = "<label>Taxon:</label> #{self.taxon.name}"
-      end
+      self.product_text = "<label>Product:</label> #{product.name}" if product
+      self.taxon_text = "<label>Taxon:</label> #{taxon.name}" if taxon
 
       # Above searchlogic date settings
-      self.date_text = "Date Range:"
-      if self.unfiltered_params
-        if self.unfiltered_params[:completed_at_gt] != '' && self.unfiltered_params[:completed_at_lt] != ''
-          self.date_text += " From #{self.unfiltered_params[:completed_at_gt]} to #{self.unfiltered_params[:completed_at_lt]}"
-        elsif self.unfiltered_params[:completed_at_gt] != ''
-          self.date_text += " After #{self.unfiltered_params[:completed_at_gt]}"
-        elsif self.unfiltered_params[:completed_at_lt] != ''
-          self.date_text += " Before #{self.unfiltered_params[:completed_at_lt]}"
+      self.date_text = 'Date Range:'
+      if unfiltered_params
+        if unfiltered_params[:completed_at_gt] != '' && unfiltered_params[:completed_at_lt] != ''
+          self.date_text += " From #{unfiltered_params[:completed_at_gt]} to #{unfiltered_params[:completed_at_lt]}"
+        elsif unfiltered_params[:completed_at_gt] != ''
+          self.date_text += " After #{unfiltered_params[:completed_at_gt]}"
+        elsif unfiltered_params[:completed_at_lt] != ''
+          self.date_text += " Before #{unfiltered_params[:completed_at_lt]}"
         else
-          self.date_text += " All"
+          self.date_text += ' All'
         end
       else
-        self.date_text += " All"
+        self.date_text += ' All'
       end
     end
 
     def download_url(base, format, report_type = nil)
       elements = []
       params[:advanced_reporting] ||= {}
-      params[:advanced_reporting]["report_type"] = report_type if report_type
+      params[:advanced_reporting]['report_type'] = report_type if report_type
       if params
         [:search, :advanced_reporting].each do |type|
           if params[type]
@@ -88,18 +92,18 @@ module Spree
           end
         end
       end
-      base.gsub!(/^\/\//,'/')
+      base.gsub!(/^\/\//, '/')
       base + '.' + format + '?' + elements.join('&')
     end
 
     def revenue(order)
       rev = order.item_total
-      if !self.product.nil? && product_in_taxon
-        rev = order.line_items.select { |li| li.product == self.product }.inject(0) { |a, b| a += b.quantity * b.price }
-      elsif !self.taxon.nil?
-        rev = order.line_items.select { |li| li.product && li.product.taxons.include?(self.taxon) }.inject(0) { |a, b| a += b.quantity * b.price }
+      if !product.nil? && product_in_taxon
+        rev = order.line_items.select { |li| li.product == product }.inject(0) { |a, b| a += b.quantity * b.price }
+      elsif !taxon.nil?
+        rev = order.line_items.select { |li| li.product && li.product.taxons.include?(taxon) }.inject(0) { |a, b| a += b.quantity * b.price }
       end
-      self.product_in_taxon ? rev : 0
+      product_in_taxon ? rev : 0
     end
 
     def profit(order)
@@ -108,36 +112,36 @@ module Spree
         profit + (variant.price - variant.cost_price.to_f) * li.quantity
       end
 
-      if !self.product.nil? && product_in_taxon
-        profit = order.line_items.select { |li| li.product == self.product }.inject(0) do |profit, li|
+      if !product.nil? && product_in_taxon
+        profit = order.line_items.select { |li| li.product == product }.inject(0) do |profit, li|
           variant = unscoped_variant(li.variant_id)
           profit +
-            (variant.price - variant.cost_price.to_f) *
-            li.quantity
+          (variant.price - variant.cost_price.to_f) *
+          li.quantity
         end
-      elsif !self.taxon.nil?
-        profit = order.line_items.select { |li| li.product && li.product.taxons.include?(self.taxon) }.inject(0) do |profit, li|
+      elsif !taxon.nil?
+        profit = order.line_items.select { |li| li.product && li.product.taxons.include?(taxon) }.inject(0) do |profit, li|
           variant = unscoped_variant(li.variant_id)
           profit +
-            (variant.price - variant.cost_price.to_f) *
-            li.quantity
+          (variant.price - variant.cost_price.to_f) *
+          li.quantity
         end
       end
-      self.product_in_taxon ? profit : 0
+      product_in_taxon ? profit : 0
     end
 
     def units(order)
       units = order.line_items.sum(:quantity)
-      if !self.product.nil? && product_in_taxon
-        units = order.line_items.select { |li| li.product == self.product }.inject(0) { |a, b| a += b.quantity }
-      elsif !self.taxon.nil?
-        units = order.line_items.select { |li| li.product && li.product.taxons.include?(self.taxon) }.inject(0) { |a, b| a += b.quantity }
+      if !product.nil? && product_in_taxon
+        units = order.line_items.select { |li| li.product == product }.inject(0) { |a, b| a += b.quantity }
+      elsif !taxon.nil?
+        units = order.line_items.select { |li| li.product && li.product.taxons.include?(taxon) }.inject(0) { |a, b| a += b.quantity }
       end
-      self.product_in_taxon ? units : 0
+      product_in_taxon ? units : 0
     end
 
-    def order_count(order)
-      self.product_in_taxon ? 1 : 0
+    def order_count(_order)
+      product_in_taxon ? 1 : 0
     end
 
     def unscoped_variant(id)

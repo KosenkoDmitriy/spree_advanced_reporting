@@ -5,17 +5,15 @@ Spree::Admin::ReportsController.class_eval do
   def basic_report_setup
     @products = Spree::Product.all
     @taxons = Spree::Taxon.all
-    if defined?(MultiDomainExtension)
-      @stores = Store.all
-    end
+    @stores = Store.all if defined?(MultiDomainExtension)
   end
 
   def geo_report_render(filename)
     params[:advanced_reporting] ||= {}
-    params[:advanced_reporting]["report_type"] = params[:advanced_reporting]["report_type"].to_sym if params[:advanced_reporting]["report_type"]
-    params[:advanced_reporting]["report_type"] ||= :state
+    params[:advanced_reporting]['report_type'] = params[:advanced_reporting]['report_type'].to_sym if params[:advanced_reporting]['report_type']
+    params[:advanced_reporting]['report_type'] ||= :state
     respond_to do |format|
-      format.html { render :template => "spree/admin/reports/geo_base" }
+      format.html { render template: 'spree/admin/reports/geo_base' }
       # format.pdf do
       #   send_data @report.ruportdata[params[:advanced_reporting]['report_type']].to_pdf
       # end
@@ -27,7 +25,7 @@ Spree::Admin::ReportsController.class_eval do
 
   def base_report_top_render(filename)
     respond_to do |format|
-      format.html { render :template => "spree/admin/reports/top_base" }
+      format.html { render template: 'spree/admin/reports/top_base' }
       # format.pdf do
       #   send_data @report.ruportdata.to_pdf
       # end
@@ -39,7 +37,7 @@ Spree::Admin::ReportsController.class_eval do
 
   def base_report_segment_render(filename)
     respond_to do |format|
-      format.html { render :template => 'spree/admin/reports/segment_base' }
+      format.html { render template: 'spree/admin/reports/segment_base' }
       # format.pdf do
       #   send_data @report.ruportdata.to_pdf
       # end
@@ -51,10 +49,10 @@ Spree::Admin::ReportsController.class_eval do
 
   def base_report_render(filename)
     params[:advanced_reporting] ||= {}
-    params[:advanced_reporting]["report_type"] = params[:advanced_reporting]["report_type"].to_sym if params[:advanced_reporting]["report_type"]
-    params[:advanced_reporting]["report_type"] ||= :daily
+    params[:advanced_reporting]['report_type'] = params[:advanced_reporting]['report_type'].to_sym if params[:advanced_reporting]['report_type']
+    params[:advanced_reporting]['report_type'] ||= :daily
     respond_to do |format|
-      format.html { render :template => "spree/admin/reports/increment_base" }
+      format.html { render template: 'spree/admin/reports/increment_base' }
       # format.pdf do
       #   if params[:advanced_reporting]["report_type"] == :all
       #     send_data @report.all_data.to_pdf
@@ -63,10 +61,10 @@ Spree::Admin::ReportsController.class_eval do
       #   end
       # end
       format.csv do
-        if params[:advanced_reporting]["report_type"] == :all
-          send_data @report.all_data.to_csv, :filename => filename
+        if params[:advanced_reporting]['report_type'] == :all
+          send_data @report.all_data.to_csv, filename: filename
         else
-          send_data @report.ruportdata[params[:advanced_reporting]['report_type']].to_csv, :filename => filename
+          send_data @report.ruportdata[params[:advanced_reporting]['report_type']].to_csv, filename: filename
         end
       end
     end
@@ -107,7 +105,6 @@ Spree::Admin::ReportsController.class_eval do
     base_report_top_render(report_name('Top Customers'))
   end
 
-
   def top_customers
     @report = Spree::AdvancedReport::TopReport::TopCustomers.new(params, 4)
     base_report_top_render(report_name('Top Customers'))
@@ -134,6 +131,7 @@ Spree::Admin::ReportsController.class_eval do
   end
 
   private
+
   def report_name(title)
     if params[:search][:created_at_gt] && params[:search][:created_at_lt]
       "#{params[:search][:created_at_gt]} - #{params[:search][:created_at_lt]} #{title}.csv"
@@ -173,7 +171,7 @@ Spree::Admin::ReportsController.class_eval do
   end
 
   def add_actions_to_available_reports
-    return if Spree::Admin::ReportsController::available_reports.has_key?(:geo_profit)
+    return if Spree::Admin::ReportsController.available_reports.key?(:geo_profit)
     advanced_reports = {}
     actions.each do |action|
       advanced_reports[action] = {
@@ -182,12 +180,12 @@ Spree::Admin::ReportsController.class_eval do
       }
     end
 
-    Spree::Admin::ReportsController::available_reports.merge!(advanced_reports)
+    Spree::Admin::ReportsController.available_reports.merge!(advanced_reports)
     I18n.locale = Rails.application.config.i18n.default_locale
     I18n.reload!
   end
 
-  def geo_report_render(filename)
+  def geo_report_render(_filename)
     params[:advanced_reporting] ||= {}
     params[:advanced_reporting]['report_type'] = params[:advanced_reporting]['report_type'].to_sym if params[:advanced_reporting]['report_type']
     params[:advanced_reporting]['report_type'] ||= :state
@@ -199,7 +197,7 @@ Spree::Admin::ReportsController.class_eval do
     end
   end
 
-  def base_report_top_render(filename)
+  def base_report_top_render(_filename)
     respond_to do |format|
       format.html { render template: 'spree/admin/reports/top_base' }
       format.csv do
@@ -208,7 +206,7 @@ Spree::Admin::ReportsController.class_eval do
     end
   end
 
-  def base_report_render(filename)
+  def base_report_render(_filename)
     params[:advanced_reporting] ||= {}
     params[:advanced_reporting]['report_type'] = params[:advanced_reporting]['report_type'].to_sym if params[:advanced_reporting]['report_type']
     params[:advanced_reporting]['report_type'] ||= :daily
