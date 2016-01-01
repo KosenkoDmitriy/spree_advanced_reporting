@@ -20,7 +20,7 @@ Advanced reporting for Spree.
 ## NOTES:
 
 This extension seems in flux, having many forks, but no official rails3/rails4 update.
-This branch is for use with **Spree 2.2.0 and later**. It will likely not work with
+This branch is for use with **Spree 3.0.0**. It will likely not work with
 earlier versions.
 
 

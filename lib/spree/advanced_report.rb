@@ -103,11 +103,25 @@ module Spree
     end
 
     def profit(order)
-      profit = order.line_items.inject(0) { |profit, li| profit + (li.variant.price - li.variant.cost_price.to_f)*li.quantity }
+      profit = order.line_items.inject(0) do |profit, li|
+        variant = unscoped_variant(li.variant_id)
+        profit + (variant.price - variant.cost_price.to_f) * li.quantity
+      end
+
       if !self.product.nil? && product_in_taxon
-        profit = order.line_items.select { |li| li.product == self.product }.inject(0) { |profit, li| profit + (li.variant.price - li.variant.cost_price.to_f)*li.quantity }
+        profit = order.line_items.select { |li| li.product == self.product }.inject(0) do |profit, li|
+          variant = unscoped_variant(li.variant_id)
+          profit +
+            (variant.price - variant.cost_price.to_f) *
+            li.quantity
+        end
       elsif !self.taxon.nil?
-        profit = order.line_items.select { |li| li.product && li.product.taxons.include?(self.taxon) }.inject(0) { |profit, li| profit + (li.variant.price - li.variant.cost_price.to_f)*li.quantity }
+        profit = order.line_items.select { |li| li.product && li.product.taxons.include?(self.taxon) }.inject(0) do |profit, li|
+          variant = unscoped_variant(li.variant_id)
+          profit +
+            (variant.price - variant.cost_price.to_f) *
+            li.quantity
+        end
       end
       self.product_in_taxon ? profit : 0
     end
@@ -124,6 +138,10 @@ module Spree
 
     def order_count(order)
       self.product_in_taxon ? 1 : 0
+    end
+
+    def unscoped_variant(id)
+      Spree::Variant.unscoped.find(id)
     end
   end
 end
