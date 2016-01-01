@@ -25,11 +25,11 @@
           </h5><br />
       <% end %>
       <%= content_tag :li do %>
-        <label><%= @report.params['search']['completed_at_gt'].strftime('%m-%d-%Y') %></label>
+        <label><%= @report.params.try(:[], :search).try(:[], :completed_at_gt).try(:strftime, '%m-%d-%Y') %></label>
         <span class="range-divider">
           <i class="icon-arrow-right"></i>
         </span>
-        <label><%= @report.params['search']['completed_at_lt'].strftime('%m-%d-%Y') %></label>
+        <label><%= @report.params.try(:[], :search).try(:[], :completed_at_lt).try(:strftime, '%m-%d-%Y') %></label>
         <div class="links">
             <%= link_to_with_icon 'icon-tasks', Spree.t(:csv), @report.download_url(request.fullpath, 'csv', 'all') %>
         </div>
