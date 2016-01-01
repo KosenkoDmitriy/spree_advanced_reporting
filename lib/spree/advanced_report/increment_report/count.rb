@@ -1,26 +1,26 @@
 class Spree::AdvancedReport::IncrementReport::Count < Spree::AdvancedReport::IncrementReport
   def name
-    "Order Count"
+    'Order Count'
   end
 
   def column
-    "Count"
+    'Count'
   end
 
   def description
-    "Total number of completed orders"
+    'Total number of completed orders'
   end
 
   def initialize(params)
     super(params)
     self.total = 0
-    self.orders.each do |order|
+    orders.each do |order|
       date = {}
       INCREMENTS.each do |type|
         date[type] = get_bucket(type, order.completed_at)
         data[type][date[type]] ||= {
-          :value => 0,
-          :display => get_display(type, order.completed_at),
+          value: 0,
+          display: get_display(type, order.completed_at)
         }
       end
       order_count = order_count(order)

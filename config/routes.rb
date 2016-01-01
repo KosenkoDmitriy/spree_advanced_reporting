@@ -1,11 +1,11 @@
 Spree::Core::Engine.routes.draw do
-  #namespace :admin do
+  # namespace :admin do
   #  resources :reports, :only => [:index, :show] do
   #    collection do
   #      get :sales_total
   #    end
   #  end
-  #end
+  # end
   match '/admin/reports/revenue' => 'admin/reports#revenue', :via => [:get, :post], :as => 'revenue_admin_reports'
   match '/admin/reports/count'   => 'admin/reports#count',   :via => [:get, :post], :as => 'count_admin_reports'
   match '/admin/reports/units'   => 'admin/reports#units',   :via => [:get, :post], :as => 'units_admin_reports'

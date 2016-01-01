@@ -1,18 +1,17 @@
 require 'advanced_reporting_hooks'
-require "ruport"
-#require "ruport/util"
+require 'ruport'
+# require "ruport/util"
 
 module Spree
   module AdvancedReporting
     class Engine < Rails::Engine
       config.autoload_paths += %W(#{config.root}/lib)
       def self.activate
-
-        Dir.glob(File.join(File.dirname(__FILE__), "../config/locales/*.yml")).each do |c|
+        Dir.glob(File.join(File.dirname(__FILE__), '../config/locales/*.yml')).each do |c|
           I18n.load_path << File.expand_path(c)
         end
 
-        Dir.glob(File.join(File.dirname(__FILE__), "../app/**/*_decorator.rb")).each do |c|
+        Dir.glob(File.join(File.dirname(__FILE__), '../app/**/*_decorator.rb')).each do |c|
           Rails.env.production? ? require(c) : load(c)
         end
 
@@ -25,11 +24,11 @@ module Spree
           # Renders individual rows for the table.
           def build_row(data = self.data)
             @odd = !@odd
-            klass = @odd ? "odd" : "even"
+            klass = @odd ? 'odd' : 'even'
             output <<
-            "\t\t<tr class=\"#{klass}\">\n\t\t\t<td>" +
-              data.to_a.join("</td>\n\t\t\t<td>") +
-              "</td>\n\t\t</tr>\n"
+              "\t\t<tr class=\"#{klass}\">\n\t\t\t<td>" +
+                data.to_a.join("</td>\n\t\t\t<td>") +
+                "</td>\n\t\t</tr>\n"
           end
 
           def html_table
@@ -52,4 +51,3 @@ module Spree
     end
   end
 end
-
