@@ -14,3 +14,4 @@ en:
     daily_details: 'Daily Sales Detail'
     customers: "Customers"
     order_details: "Order Details"
+    no_line_items_found: "No any line items found"
